@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سامانه جوایز دانش‌آموزان</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <span class="badge">🎁 سامانه جوایز</span>
+      <h1>جایزه‌ات را خودت انتخاب کن!</h1>
+      <p>امتیازت را ببین، بین جایزه‌ها انتخاب کن و درخواستت را ثبت کن.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="login-card" id="loginSection">
+      <h2>ورود دانش‌آموز</h2>
+      <p>نام کاربری خود را وارد کنید.</p>
+      <div class="login-row">
+        <input id="username" type="text" placeholder="نام کاربری" autocomplete="username">
+        <button id="loginBtn">ورود</button>
+      </div>
+      <small id="loginMessage"></small>
+    </section>
+
+    <section id="studentPanel" class="hidden">
+      <div class="student-bar">
+        <div>
+          <span>سلام،</span> <strong id="studentName"></strong>
+          <div class="muted">امتیاز قابل استفاده</div>
+        </div>
+        <div class="points" id="studentPoints">0 امتیاز</div>
+        <button class="secondary" id="logoutBtn">خروج</button>
+      </div>
+
+      <div class="section-title">
+        <div><h2>جوایز موجود</h2><p>برای انتخاب، روی «دریافت جایزه» بزنید.</p></div>
+      </div>
+      <div id="rewardsGrid" class="rewards-grid"></div>
+      <p id="emptyMessage" class="empty hidden">جایزه‌ای برای نمایش وجود ندارد.</p>
+
+      <section class="requests">
+        <h2>درخواست‌های من</h2>
+        <div id="requestsList"></div>
+      </section>
+    </section>
+  </main>
+
+  <footer>سامانه جوایز دانش‌آموزان • نسخه اولیه</footer>
+  <script src="app.js"></script>
+</body>
+</html>
