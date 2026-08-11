@@ -7,49 +7,32 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="hero">
-    <div class="container">
-      <span class="badge">🎁 سامانه جوایز</span>
-      <h1>جایزه‌ات را خودت انتخاب کن!</h1>
-      <p>امتیازت را ببین، بین جایزه‌ها انتخاب کن و درخواستت را ثبت کن.</p>
+<header class="hero"><div class="container"><span class="badge">🎁 سامانه جوایز</span><h1>جایزه‌ات را خودت انتخاب کن!</h1><p>امتیازت را ببین، بین جایزه‌ها انتخاب کن و درخواستت را ثبت کن.</p></div></header>
+<main class="container">
+  <section class="login-card" id="loginSection">
+    <h2>ورود دانش‌آموز</h2><p>نام کاربری خود را وارد کنید.</p>
+    <div class="login-row"><input id="username" type="text" placeholder="نام کاربری"><button id="loginBtn">ورود</button></div>
+    <small id="loginMessage"></small>
+    <button class="admin-link" id="adminOpenBtn">ورود مدیر</button>
+  </section>
+
+  <section id="studentPanel" class="hidden">
+    <div class="student-bar"><div><span>سلام،</span> <strong id="studentName"></strong><div class="muted">امتیاز قابل استفاده</div></div><div class="points" id="studentPoints">0 امتیاز</div><button class="secondary" id="logoutBtn">خروج</button></div>
+    <div class="section-title"><h2>جوایز موجود</h2><p>برای انتخاب، روی «دریافت جایزه» بزنید.</p></div>
+    <div id="rewardsGrid" class="rewards-grid"></div><p id="emptyMessage" class="empty hidden">جایزه‌ای برای نمایش وجود ندارد.</p>
+    <section class="requests"><h2>درخواست‌های من</h2><div id="requestsList"></div></section>
+  </section>
+
+  <section id="adminPanel" class="hidden admin-panel">
+    <div class="student-bar"><div><strong>پنل مدیریت</strong><div class="muted">مدیریت دانش‌آموزان، جوایز و درخواست‌ها</div></div><button class="secondary" id="adminLogoutBtn">خروج</button></div>
+    <div class="admin-grid">
+      <section class="admin-card"><h2>👨‍🎓 افزودن دانش‌آموز</h2><div class="form-grid"><input id="newStudentKey" placeholder="نام کاربری انگلیسی"><input id="newStudentName" placeholder="نام و نام خانوادگی"><input id="newStudentPoints" type="number" min="0" placeholder="امتیاز اولیه"><button id="addStudentBtn">افزودن</button></div><div id="studentsAdminList"></div></section>
+      <section class="admin-card"><h2>🎁 افزودن جایزه</h2><div class="form-grid"><input id="newRewardName" placeholder="نام جایزه"><input id="newRewardCost" type="number" min="1" placeholder="امتیاز لازم"><input id="newRewardStock" type="number" min="0" placeholder="موجودی"><input id="newRewardEmoji" placeholder="ایموجی مثل 🎁"><button id="addRewardBtn">افزودن جایزه</button></div><div id="rewardsAdminList"></div></section>
     </div>
-  </header>
-
-  <main class="container">
-    <section class="login-card" id="loginSection">
-      <h2>ورود دانش‌آموز</h2>
-      <p>نام کاربری خود را وارد کنید.</p>
-      <div class="login-row">
-        <input id="username" type="text" placeholder="نام کاربری" autocomplete="username">
-        <button id="loginBtn">ورود</button>
-      </div>
-      <small id="loginMessage"></small>
-    </section>
-
-    <section id="studentPanel" class="hidden">
-      <div class="student-bar">
-        <div>
-          <span>سلام،</span> <strong id="studentName"></strong>
-          <div class="muted">امتیاز قابل استفاده</div>
-        </div>
-        <div class="points" id="studentPoints">0 امتیاز</div>
-        <button class="secondary" id="logoutBtn">خروج</button>
-      </div>
-
-      <div class="section-title">
-        <div><h2>جوایز موجود</h2><p>برای انتخاب، روی «دریافت جایزه» بزنید.</p></div>
-      </div>
-      <div id="rewardsGrid" class="rewards-grid"></div>
-      <p id="emptyMessage" class="empty hidden">جایزه‌ای برای نمایش وجود ندارد.</p>
-
-      <section class="requests">
-        <h2>درخواست‌های من</h2>
-        <div id="requestsList"></div>
-      </section>
-    </section>
-  </main>
-
-  <footer>سامانه جوایز دانش‌آموزان • نسخه اولیه</footer>
-  <script src="app.js"></script>
-</body>
-</html>
+    <section class="admin-card"><h2>📋 درخواست‌های جایزه</h2><div id="allRequestsList"></div></section>
+  </section>
+</main>
+<div id="adminLoginModal" class="modal hidden"><div class="modal-box"><button class="modal-close" id="modalClose">×</button><h2>ورود مدیر</h2><p>رمز مدیر را وارد کنید.</p><input id="adminPassword" type="password" placeholder="رمز مدیر"><button id="adminLoginBtn">ورود به پنل</button><small id="adminMessage"></small></div></div>
+<footer>سامانه جوایز دانش‌آموزان • نسخه اولیه</footer>
+<script src="app.js"></script>
+</body></html>
