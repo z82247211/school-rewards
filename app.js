@@ -1,41 +1,25 @@
-const students={
-  ali:{name:'علی رضایی',points:120},
-  sara:{name:'سارا محمدی',points:250},
-  reza:{name:'رضا احمدی',points:80}
-};
-const rewards=[
-  {id:1,name:'دفتر فانتزی',cost:50,emoji:'📒'},
-  {id:2,name:'جامدادی رنگی',cost:80,emoji:'🖍️'},
-  {id:3,name:'خودکار چندرنگ',cost:100,emoji:'🖊️'},
-  {id:4,name:'آبرنگ 16 رنگ',cost:150,emoji:'🎨'},
-  {id:5,name:'ماژیک رنگی',cost:200,emoji:'🖌️'},
-  {id:6,name:'ست لوازم تحریر',cost:250,emoji:'🎁'}
-];
-let currentUser=null;
-const $=id=>document.getElementById(id);
-function login(){
-  const key=$('username').value.trim().toLowerCase();
-  if(!students[key]){$('loginMessage').textContent='نام کاربری پیدا نشد. برای آزمایش از ali، sara یا reza استفاده کنید.';return;}
-  currentUser=key;$('loginSection').classList.add('hidden');$('studentPanel').classList.remove('hidden');render();
-}
-function render(){
-  const s=students[currentUser];$('studentName').textContent=s.name;$('studentPoints').textContent=`${s.points} امتیاز`;
-  const grid=$('rewardsGrid');grid.innerHTML='';
-  rewards.forEach(r=>{const can=s.points>=r.cost;const card=document.createElement('article');card.className='reward';card.innerHTML=`<div class="emoji">${r.emoji}</div><h3>${r.name}</h3><div class="price">${r.cost} امتیاز</div><button ${can?'':'disabled'}>${can?'دریافت جایزه':'امتیاز کافی نیست'}</button>`;card.querySelector('button').onclick=()=>requestReward(r.id);grid.appendChild(card)});
-  renderRequests();
-}
-function requestReward(id){
-  const r=rewards.find(x=>x.id===id);const s=students[currentUser];
-  if(s.points<r.cost)return;
-  s.points-=r.cost;
-  const requests=JSON.parse(localStorage.getItem('rewardRequests')||'[]');
-  requests.push({student:s.name,reward:r.name,cost:r.cost,status:'در انتظار بررسی'});
-  localStorage.setItem('rewardRequests',JSON.stringify(requests));render();
-}
-function renderRequests(){
-  const list=$('requestsList');const all=JSON.parse(localStorage.getItem('rewardRequests')||'[]').filter(x=>x.student===students[currentUser].name);list.innerHTML='';
-  if(!all.length){list.innerHTML='<p class="empty">هنوز درخواستی ثبت نکرده‌اید.</p>';return}
-  all.forEach(x=>{const el=document.createElement('div');el.className='request';el.innerHTML=`<span>${x.reward} — ${x.cost} امتیاز</span><span class="status">${x.status}</span>`;list.appendChild(el)});
-}
+const defaultStudents={ali:{name:'علی رضایی',points:120},sara:{name:'سارا محمدی',points:250},reza:{name:'رضا احمدی',points:80}};
+const defaultRewards=[{id:1,name:'دفتر فانتزی',cost:50,stock:20,emoji:'📒'},{id:2,name:'جامدادی رنگی',cost:80,stock:15,emoji:'🖍️'},{id:3,name:'خودکار چندرنگ',cost:100,stock:25,emoji:'🖊️'},{id:4,name:'آبرنگ 16 رنگ',cost:150,stock:10,emoji:'🎨'},{id:5,name:'ماژیک رنگی',cost:200,stock:8,emoji:'🖌️'},{id:6,name:'ست لوازم تحریر',cost:250,stock:5,emoji:'🎁'}];
+const $=id=>document.getElementById(id);let currentUser=null;
+function load(key,def){const x=localStorage.getItem(key);if(x)return JSON.parse(x);localStorage.setItem(key,JSON.stringify(def));return JSON.parse(JSON.stringify(def))}
+function save(key,val){localStorage.setItem(key,JSON.stringify(val))}
+function students(){return load('students',defaultStudents)} function rewards(){return load('rewards',defaultRewards)} function requests(){return load('rewardRequests',[])}
+function login(){const key=$('username').value.trim().toLowerCase();const data=students();if(!data[key]){$('loginMessage').textContent='نام کاربری پیدا نشد.';return}currentUser=key;$('loginSection').classList.add('hidden');$('studentPanel').classList.remove('hidden');renderStudent()}
+function renderStudent(){const s=students()[currentUser];$('studentName').textContent=s.name;$('studentPoints').textContent=`${s.points} امتیاز`;const grid=$('rewardsGrid');grid.innerHTML='';rewards().forEach(r=>{const can=s.points>=r.cost&&r.stock>0;const card=document.createElement('article');card.className='reward';card.innerHTML=`<div class="emoji">${r.emoji}</div><h3>${r.name}</h3><div class="price">${r.cost} امتیاز</div><div class="stock">موجودی: ${r.stock}</div><br><button ${can?'':'disabled'}>${r.stock===0?'ناموجود':can?'دریافت جایزه':'امتیاز کافی نیست'}</button>`;if(can)card.querySelector('button').onclick=()=>requestReward(r.id);grid.appendChild(card)});renderMyRequests()}
+function requestReward(id){const rs=rewards(),r=rs.find(x=>x.id===id),ss=students(),s=ss[currentUser];if(!r||r.stock<1||s.points<r.cost)return;s.points-=r.cost;r.stock--;save('students',ss);save('rewards',rs);const rr=requests();rr.push({id:Date.now(),studentKey:currentUser,student:s.name,reward:r.name,cost:r.cost,status:'در انتظار بررسی'});save('rewardRequests',rr);renderStudent()}
+function renderMyRequests(){const list=$('requestsList');const all=requests().filter(x=>x.studentKey===currentUser);list.innerHTML=all.length?'':'<p class="empty">هنوز درخواستی ثبت نکرده‌اید.</p>';all.forEach(x=>{const el=document.createElement('div');el.className='request';el.innerHTML=`<span>${x.reward} — ${x.cost} امتیاز</span><span class="status">${x.status}</span>`;list.appendChild(el)})}
 function logout(){currentUser=null;$('studentPanel').classList.add('hidden');$('loginSection').classList.remove('hidden');$('username').value='';$('loginMessage').textContent=''}
-$('loginBtn').onclick=login;$('logoutBtn').onclick=logout;$('username').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+function openAdmin(){ $('adminLoginModal').classList.remove('hidden');$('adminPassword').focus() } function closeAdmin(){ $('adminLoginModal').classList.add('hidden');$('adminPassword').value='';$('adminMessage').textContent='' }
+function adminLogin(){if($('adminPassword').value!=='1234'){$('adminMessage').textContent='رمز مدیر اشتباه است.';return}closeAdmin();$('loginSection').classList.add('hidden');$('adminPanel').classList.remove('hidden');renderAdmin()}
+function adminLogout(){$('adminPanel').classList.add('hidden');$('loginSection').classList.remove('hidden')}
+function renderAdmin(){renderStudentsAdmin();renderRewardsAdmin();renderAllRequests()}
+function renderStudentsAdmin(){const list=$('studentsAdminList');list.innerHTML='';Object.entries(students()).forEach(([key,s])=>{const row=document.createElement('div');row.className='admin-row';row.innerHTML=`<span><strong>${s.name}</strong><br><small>${key} • ${s.points} امتیاز</small></span><span><button onclick="changePoints('${key}',10)">+۱۰</button><button onclick="changePoints('${key}',-10)">−۱۰</button></span>`;list.appendChild(row)})}
+function changePoints(key,amount){const ss=students();if(!ss[key])return;ss[key].points=Math.max(0,ss[key].points+amount);save('students',ss);renderAdmin()}
+function addStudent(){const key=$('newStudentKey').value.trim().toLowerCase(),name=$('newStudentName').value.trim(),points=Number($('newStudentPoints').value||0),ss=students();if(!key||!name||ss[key])return alert('نام کاربری خالی است یا قبلاً ثبت شده.');ss[key]={name,points:Math.max(0,points)};save('students',ss);$('newStudentKey').value='';$('newStudentName').value='';$('newStudentPoints').value='';renderAdmin()}
+function renderRewardsAdmin(){const list=$('rewardsAdminList');list.innerHTML='';rewards().forEach(r=>{const row=document.createElement('div');row.className='admin-row';row.innerHTML=`<span>${r.emoji} <strong>${r.name}</strong><br><small>${r.cost} امتیاز • موجودی ${r.stock}</small></span><span><button onclick="changeStock(${r.id},1)">+۱</button><button onclick="changeStock(${r.id},-1)">−۱</button><button onclick="deleteReward(${r.id})">حذف</button></span>`;list.appendChild(row)})}
+function changeStock(id,n){const rs=rewards(),r=rs.find(x=>x.id===id);if(!r)return;r.stock=Math.max(0,r.stock+n);save('rewards',rs);renderAdmin()}
+function addReward(){const name=$('newRewardName').value.trim(),cost=Number($('newRewardCost').value),stock=Number($('newRewardStock').value),emoji=$('newRewardEmoji').value.trim()||'🎁';if(!name||cost<1)return alert('نام و امتیاز جایزه را وارد کنید.');const rs=rewards();rs.push({id:Date.now(),name,cost,stock:Math.max(0,stock),emoji});save('rewards',rs);['newRewardName','newRewardCost','newRewardStock','newRewardEmoji'].forEach(id=>$(id).value='');renderAdmin()}
+function deleteReward(id){save('rewards',rewards().filter(x=>x.id!==id));renderAdmin()}
+function renderAllRequests(){const list=$('allRequestsList'),all=requests();list.innerHTML=all.length?'':'<p class="empty">هنوز درخواستی ثبت نشده است.</p>';all.slice().reverse().forEach(x=>{const row=document.createElement('div');row.className='admin-row';row.innerHTML=`<span><strong>${x.student}</strong> — ${x.reward}<br><small>${x.cost} امتیاز</small></span><span><span class="status">${x.status}</span> <button onclick="approveRequest(${x.id})">تأیید</button></span>`;list.appendChild(row)})}
+function approveRequest(id){const rr=requests(),x=rr.find(r=>r.id===id);if(!x||x.status==='تأیید شد')return;x.status='تأیید شد';save('rewardRequests',rr);renderAdmin()}
+$('loginBtn').onclick=login;$('logoutBtn').onclick=logout;$('username').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('adminOpenBtn').onclick=openAdmin;$('modalClose').onclick=closeAdmin;$('adminLoginBtn').onclick=adminLogin;$('adminLogoutBtn').onclick=adminLogout;$('addStudentBtn').onclick=addStudent;$('addRewardBtn').onclick=addReward;$('adminPassword').addEventListener('keydown',e=>{if(e.key==='Enter')adminLogin()});
